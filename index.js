@@ -104,7 +104,7 @@ async function gallery(images, favorites){
 
 
 
-//Part 3, 4, and 5
+//Part 3, 4, 5, and 7
 axios.interceptors.request.use(function (config) {
     progressBar.style.width = "0%"
     config.metadata = { startTime: new Date()}
