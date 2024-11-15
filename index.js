@@ -1,4 +1,4 @@
-// import * as Carousel from "Carousel.js";
+import * as Carousel from "./carousel.js";
 // import axios from "axios";
 
 // The breed selection input element.
@@ -33,7 +33,7 @@ let initialLoad = async function (){
             }
         }
     ).catch(err => console.log(err))
-    
+    breedSelectHandler()  
 }
 
 
@@ -56,27 +56,72 @@ initialLoad()
  * - Add a call to this function to the end of your initialLoad function above to create the initial carousel.
  */
 // await axios.get(`${BASE_URL}/breeds/${breedInfo}`
-const carousel = document.getElementsByClassName('carousel')
+// const carousel = document.getElementsByClassName('carousel')
 
-let breedSelectHandler = async function (e){
-    let breedInfo = e.target.value;
-    console.log(breedInfo);
-    await axios.get(`${BASE_URL}images/search?breed_ids=${breedInfo}`).then(res => {
-        // console.log(res);
-        const images = res.data;
-        for(let i=0; i<images.length; i++){
-            carousel.appendCarousel(carousel.createCard(images[i].url, images[i].id))
-            infoDump.innerHTML += `<h2>${images[i].breeds[0].name}</h2>`
-            infoDump.innerHTML += `<p>${images[i].breeds[0].description}</p>`
-            infoDump.innerHTML += `<p>${images[i].breeds[0].temperament}</p>`
-            infoDump.innerHTML += `<p>${images[i].breeds[0].origin}</p>`
-            infoDump.innerHTML += `<p>${images[i].breeds[0].life_span}</p>`
-        }
-    }).catch(err => console.log(err))
+// let breedSelectHandler = async function (e){
+//     let breedInfo = breedSelect.value;
+//     console.log(breedInfo);
+//     await axios.get(`${BASE_URL}images/search?breed_ids=${breedInfo}`).then(res => {
+//         // console.log(res);
+//         const images = res.data;
+//         for(let i=0; i<images.length; i++){
+//             carousel.appendCarousel(carousel.createCard(images[i].url, images[i].id))
+//             infoDump.innerHTML += `<h2>${images[i].breeds[0].name}</h2>`
+//             infoDump.innerHTML += `<p>${images[i].breeds[0].description}</p>`
+//             infoDump.innerHTML += `<p>${images[i].breeds[0].temperament}</p>`
+//             infoDump.innerHTML += `<p>${images[i].breeds[0].origin}</p>`
+//             infoDump.innerHTML += `<p>${images[i].breeds[0].life_span}</p>`
+//         }
+//     }).catch(err => console.log(err))
+// }
+
+
+breedSelect.addEventListener("change", breedSelectHandler)
+
+async function breedSelectHandler() {
+    const selected = breedSelect.value 
+    let response = await axios(
+        `https://api.thecatapi.com/v1/images/search?limit=25&%breed_ids=${selected}`
+        // { onDownloadProgress: updateProgress }
+    ) 
+    
+    let images = await response.data;
+    console.log("images", images)
+    gallery(images)
 }
-// breedSelectHandler()
 
-breedSelect.addEventListener("click", breedSelectHandler)
+async function gallery(images, favorites){
+    Carousel.clear();
+    images.forEach((image) => {
+        let item = Carousel.createCarouselItem(
+           image.url,
+           breedSelect.value,
+           image.id 
+        )
+        Carousel.appendCarousel(item)
+    })
+
+    console.log(images[0])
+
+    if (favorites){
+        console.log("favorites")
+        infoDump.innerHTML = `
+        <h2>favorites<h2>`
+    } else if (images[0]){
+        console.log("images found")
+        infoDump.innerHTML = `
+        <h2>${images[0].breeds[0].name}</h2>
+        <p>Description: ${images[0].breeds[0].description}</p>
+        <p>Temperament: ${images[0].breeds[0].temperament}</p>
+        <p>Origin: ${images[0].breeds[0].origin}</p>`
+    } else{
+        infoDump.innerHTML = "<div class ='text-center'>Information not found</div>"
+    }
+
+    Carousel.start()
+}
+
+
 
 
 
@@ -106,7 +151,6 @@ breedSelect.addEventListener("click", breedSelectHandler)
  */
 
 
-console.log()
 
 
 /**
