@@ -81,8 +81,8 @@ breedSelect.addEventListener("change", breedSelectHandler)
 async function breedSelectHandler() {
     const selected = breedSelect.value 
     let response = await axios(
-        `https://api.thecatapi.com/v1/images/search?limit=25&%breed_ids=${selected}`
-        // { onDownloadProgress: updateProgress }
+        `https://api.thecatapi.com/v1/images/search?limit=25&%breed_ids=${selected}`,
+        { onDownloadProgress: updateProgress }
     ) 
     
     let images = await response.data;
@@ -151,8 +151,9 @@ async function gallery(images, favorites){
  */
 
 axios.interceptors.request.use(function (config) {
- 
+    progressBar.style.width = "0%"
     config.metadata = { startTime: new Date()}
+    document.body.style.cursor = "progress"
     return config;
   }, function (error) {
     return Promise.reject(error);
@@ -166,6 +167,7 @@ axios.interceptors.request.use(function (config) {
   }, function (error) {
     error.config.metadata.endTime = new Date();
     error.duration = error.config.metadata.endTime - error.config.metadata.startTime;
+    document.body.style.cursor = "default"
     return Promise.reject(error);
   });
 
@@ -187,11 +189,24 @@ axios.interceptors.request.use(function (config) {
  *   with for future projects.
  */
 
+function updateProgress(ProgressEvent){
+    console.log(ProgressEvent)
+
+    progressBar.style.width = "100%"
+}
+
+
+
 /**
  * 7. As a final element of progress indication, add the following to your axios interceptors:
  * - In your request interceptor, set the body element's cursor style to "progress."
  * - In your response interceptor, remove the progress cursor style from the body element.
  */
+
+
+
+
+
 /**
  * 8. To practice posting data, we'll create a system to "favourite" certain images.
  * - The skeleton of this function has already been created for you.
