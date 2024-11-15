@@ -150,6 +150,24 @@ async function gallery(images, favorites){
  * - As an added challenge, try to do this on your own without referencing the lesson material.
  */
 
+axios.interceptors.request.use(function (config) {
+ 
+    config.metadata = { startTime: new Date()}
+    return config;
+  }, function (error) {
+    return Promise.reject(error);
+  });
+
+  axios.interceptors.response.use(function (response) {
+ 
+    response.config.metadata.endTime = new Date()
+    response.duration = response.config.metadata.endTime - response.config.metadata.startTime
+    return response;
+  }, function (error) {
+    error.config.metadata.endTime = new Date();
+    error.duration = error.config.metadata.endTime - error.config.metadata.startTime;
+    return Promise.reject(error);
+  });
 
 
 
